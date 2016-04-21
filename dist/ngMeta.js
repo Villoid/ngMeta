@@ -29,7 +29,7 @@
 
       //One-time configuration
       var config = {
-        useTitleSuffix: false
+        useTitleSuffix: 'never'
       };
 
       function Meta($rootScope) {
@@ -60,7 +60,7 @@
             throw new Error('Cannot call setTitle when ngMeta is undefined. Did you forget to call ngMeta.init() in the run block? \nRefer: https://github.com/vinaygopinath/ngMeta#getting-started');
           }
           $rootScope.ngMeta.title = angular.isDefined(title) ? title : defaults.title;
-          if (config.useTitleSuffix) {
+          if (config.useTitleSuffix === 'always' || (config.useTitleSuffix === 'notDefaultTitle' && title)) {
             $rootScope.ngMeta.title += angular.isDefined(titleSuffix) ? titleSuffix : defaults.titleSuffix;
           }
           return this;
@@ -92,6 +92,20 @@
 
         /**
          * @ngdoc method
+         * @name ngMeta#getDefaultTag
+         * @param {string} tag The default tag name.
+         *
+         * @description
+         * Gets the a default tag value
+         *
+         * @returns {string} value
+         */
+        var getDefaultTag = function(tag) {
+          return defaults[tag];
+        };
+
+        /**
+         * @ngdoc method
          * @name readRouteMeta
          * @description
          * Helper function to process meta tags on route/state
@@ -108,6 +122,10 @@
          */
         var readRouteMeta = function(meta) {
           meta = meta || {};
+
+          if (meta.disableUpdate) {
+            return false;
+          }
 
           setTitle(meta.title, meta.titleSuffix);
 
@@ -161,7 +179,8 @@
         return {
           'init': init,
           'setTitle': setTitle,
-          'setTag': setTag
+          'setTag': setTag,
+          'getDefaultTag': getDefaultTag
         };
       }
 
@@ -236,8 +255,20 @@
        *
        * @returns {Object} self
        */
-      this.useTitleSuffix = function(bool) {
-        config.useTitleSuffix = !!bool;
+      this.useTitleSuffix = function(mode) {
+        if (mode === true || mode === 'always') {
+          config.useTitleSuffix = 'always';
+        }
+        else if (mode === 'notDefaultTitle') {
+          config.useTitleSuffix = mode;
+        }
+        else if (mode === false || mode === 'never') {
+          config.useTitleSuffix = 'never';
+        }
+        else {
+          console.warn('ngMeta.useTitleSuffix expected one of these:', [true, false, 'always', 'notDefaultTitle', 'never']);
+          config.useTitleSuffix = 'never';
+        }
         return this;
       };
 
