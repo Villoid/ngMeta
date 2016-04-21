@@ -92,6 +92,20 @@
 
         /**
          * @ngdoc method
+         * @name ngMeta#getDefaultTag
+         * @param {string} tag The default tag name.
+         *
+         * @description
+         * Gets the a default tag value
+         *
+         * @returns {string} value
+         */
+        var getDefaultTag = function(tag) {
+          return defaults[tag];
+        };
+
+        /**
+         * @ngdoc method
          * @name readRouteMeta
          * @description
          * Helper function to process meta tags on route/state
@@ -165,7 +179,8 @@
         return {
           'init': init,
           'setTitle': setTitle,
-          'setTag': setTag
+          'setTag': setTag,
+          'getDefaultTag': getDefaultTag
         };
       }
 
